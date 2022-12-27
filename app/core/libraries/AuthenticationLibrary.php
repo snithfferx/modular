@@ -13,6 +13,9 @@
             }
             $this->tokenator = new Tokenator;
         }
+        /**
+         * Revisa sí la sesión está inicializada
+         */
         public function isSessionStarted() {
             $response = false;
             if ($this->sessionUser === false) @session_start();
@@ -34,22 +37,40 @@
             }
             return $response;
         }
+        /**
+         * Mata una sesion de usuario
+         */
         public function userSessionKiller () {
             if ($this->sessionUser === false) @session_start();
             return $this->sessionKiller();
         }
+        /**
+         * Extrae la información de una sesion
+         */
         public function getSessionData ($value) {
             return $this->getUserSessionData($value);
         }
+        /**
+         * Destructor de la clase
+         */
         public function __destruct() {
             $this->sessionUser = null;
         }
+        public function createToken ($values) {
+            return $this->getToken($this->tokenator->make($values));
+        }
+        /**
+         * Revisa sí el tiempo de la sesion se ha agotado
+         */
         protected function isTimeOut ($time) {
             date_default_timezone_set("America/El_Salvador");
             $serverTime = time();
             $leftTime = $time - $serverTime;
             return ($leftTime <= 0) ? true : false;
         }
+        /**
+         * 
+         */
         protected function sessionKiller() {
             if (isset($_SESSION['token'])) $this->tokenator->kill($_SESSION['token']);
             session_unset();
@@ -99,6 +120,13 @@
                 if ($response < $serverTime) $response = $timeLimit;
             }
             return $response;
+        }
+        private function getToken(array $vars) : array {
+            if (!empty($vars)) {
+                $_SESSION['token'] = $vars['token'];
+                return $vars;
+            }
+            return ['error'=>[500,"Token Not created"]];
         }
 
     }
@@ -334,16 +362,9 @@
             $text  = $fecha . "-" . $hora . "_$" . $user;
             $encripted = base64_encode($text);
             $hashu = hash("sha256",$encripted);
-            $id    = $this->saveToken($fecha,$hora,$user,$hashu);
             $sid   = session_id();
-            if ($id != false && is_numeric($id)) {
-                $tokenSession = "@" . $hora . "#" . $fecha . "$" . $user . "-" . $id . "." . $sid . "." . $hashu;
-                $upToken = $this->updateToken($id,["lstring"=>$tokenSession]);
-                $response= ($upToken) ? $tokenSession : $upToken;
-            } else {
-                $response = $id;
-            }
-            return $response;
+            $tokenSession = "@" . $hora . "#" . $fecha . "$" . $user . "." . $sid . "." . $hashu;
+            return ['id'=>$sid,'token'=>$tokenSession];
         }
         private function tokenFinder($value) {
             $tokenData = $this->tokenDecode($value);
@@ -372,12 +393,6 @@
                 'hashid'=>$arrayHash[0],'hashsession'=>$arrayHash[1],'hashtoken'=>$arrayHash[2]];
             return $response;
         }
-        private function saveToken ($date,$time,$user,$token) {
-            require_once _MODELO_ . "User.php";
-            $model = new User;
-            $response = $model->saveToken($token,$date,$time,$user);
-            return $response;
-        }
         private function killToken ($token) {
             require_once _MODELO_ . "User.php";
             $model = new User;
@@ -388,12 +403,6 @@
                 $tokenData['user'],
                 $tokenData['date'],
                 $tokenData['time']);
-            return $response;
-        }
-        private function updateToken($tokenId,$change) {
-            require_once _MODELO_ . "User.php";
-            $model = new User;
-            $response = $model->updateTokenData($tokenId,$change);
             return $response;
         }
     }
