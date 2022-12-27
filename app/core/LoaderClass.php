@@ -32,11 +32,11 @@
             $path = ($pos === false) ? $url : substr($url,1,($pos - 1));
             if ($path == "/") {
                 $response = $this->controller->getResponse([
-                    'sv_method'=>$serverRequestMethod,
-                    'app_module'=>"home",
+                    'sv_method' => $serverRequestMethod,
+                    'app_module'=> "home",
                     'app_class' => "home",
-                    'app_method'=>"index",
-                    'app_params'=>null
+                    'app_method'=> "index",
+                    'app_params'=> null
                 ]);
             } else {
                 $pathArray = explode('/', $path);
@@ -66,10 +66,10 @@
                 if (empty($request)) {
                     $request = [
                         'sv_method' => $serverRequestMethod,
-                        'app_module' => $controller,
+                        'app_module'=> $controller,
                         'app_class' => $class,
-                        'app_method' => $method,
-                        'app_params' => $params];
+                        'app_method'=> $method,
+                        'app_params'=> $params];
                 }
                 /* if ($this->userAlive == false) {
                     if (!empty($_REQUEST) && $_REQUEST['ctr'] == "users") {
