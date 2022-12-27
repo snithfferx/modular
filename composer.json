@@ -1,0 +1,23 @@
+{
+    "name": "bytes4run/ciraco",
+    "description": "Sistema de inventarios",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "app\\": "./app"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jorge Echeverria",
+            "email": "jecheverria@bytes4run.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "phpmailer/phpmailer": "^6.5",
+        "smarty/smarty": "^3.1",
+        "almasaeed2010/adminlte": "~3.2"
+    }
+}

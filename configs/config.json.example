@@ -1,0 +1,40 @@
+{
+    "author":"Bytes4Run",
+    "descripcion":"Compraventa, Inventarios, Recursos, Administración, Contabilidad y Producción",
+    "version":"0.0.1",
+    "shortversion":"1.0",
+    "language":"es",
+    "skin":"default",
+    "app_name":"CIRACO",
+    "app_logo":"app_logo.png",
+    "app_url":"http:\/\/ciraco.test\/",
+    "company":"Bytes4Run",
+    "companyURL":"http:\/\/www.bytes4run.com\/",
+    "startYear":"2022",
+    "dbhost":"127.0.0.1",
+    "dbport":"3306",
+    "dbname":"ciracp_db",
+    "dbuser":"root",
+    "dbpass":"",
+    "enviroment":"dev",
+    "default_ctr":"home",
+    "colaboration":[
+        {
+            "theme":[
+                {
+                    "url":"https:\/\/adminlte.io\/",
+                    "name":"AdminLTE 3.2"
+                }
+            ],
+            "technology":[
+                {
+                    "url":"https:\/\/www.smarty.net\/",
+                    "name":"SMARTY 3.0"
+                },{
+                    "url":"https:\/\/github.com\/PHPMailer\/PHPMailer",
+                    "name":"PHPMailer 6.4.0"
+                }
+            ]
+        }
+    ]
+}
