@@ -1,10 +1,10 @@
-# CIRACP
+# MODULAR
 
-Sistema de compraventa de mercaderia, inventarios de productos, recursos de materiales, administracion de usuarios y recursos, contabilidad y produccion de productos.
+Framework base para creación de aplicaciones, estilo laravel y codeigniter.
 
 ## Introduccion
 
-Aplicacion desarrollada para llevar el invetario de compra y venta productos, producidos y completos, recursos de produccion y administrativos, administracion de recursos humanos y materiales, contabilidad y produccion.
+Basado en MVC, consta de las clases necesarias para conexión a base de datos y tratamiento de datos, clase controller para manejo de peticiones, administración de usuarios, modulo home predeterminado, con integración de motor de plantillas SMARTY predeterminado, PHPMAILER para envío de correo, Guzzle para consumo de API's, Plantilla AdminLTE predeterminada.
 
 ### Tabla de contenido
 
@@ -16,8 +16,8 @@ Aplicacion desarrollada para llevar el invetario de compra y venta productos, pr
 
 ### General-information
 
-Sistema para llevar el inventario de creación de cotizaciones, ordenes, compras, facturas, de productos importados.
-Contiene analisis simple de datos y gráficos para visualización de resultados.
+"framework" base para aplicaciones, basado en MVC, con herramientas de administración de usuarios y peticiones.
+Se encuentra estructurado de la siguiente manera.
 
 ### Technologies
 
