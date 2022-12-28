@@ -62,3 +62,5 @@ La aplicación tiene la siguiente estructura:
 - Contacto: [jecheverria@bytes4run.com](jecheverria@bytes4run)
 - Website: [sito web](https://bytes4run.com/applications/modular)
 - Tema: [AdminLTE](https://adminlte.io)
+- Version: 1.0.0 dev r1
+- Short-version: 1.0
