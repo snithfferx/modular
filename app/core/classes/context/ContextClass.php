@@ -5,7 +5,7 @@
      * @author Jorge Echeverria <jecheverria@bytes4run.com>
      * @version 1.0.0
      */
-    class ContextClass {
+    class ContextClass extends ConnectionClass{
         /**
          * Esta función se encarga de traer todos los registros solicitados a una tabla
          *
@@ -27,17 +27,11 @@
          * @link /docs/develop/queryStringCondition
          * @return array
          */
-        public function getData(string $tableName, array $data = [], array $joins = [], int $limit = 1000, string $sort = '', string $sortBy = '') :array {
+        public function select(string $tableName, mixed $data, array $joins = [],string $params="", int $limit = 1000, string $sort = '', string $sortBy = '') :array {
             if (empty($tableName)) {
-                $response = ['type' => "error", 'message' => "No hay tabla para consultar."];
+                $response = ['error'=>['code'=>404,'message' => "No hay tabla para consultar."], 'data' => array()];
             } else {
-                if (is_string($data)) {
-                    $response = $this->getDBData(
-                        $tableName,
-                        $data,$joins, $sort);
-                } else {
-                    $response = $this->getDBData($tableName,$data,$joins,$limit,$sort,$sortBy);
-                }
+                $response = $this->getDBData($tableName,$data,$joins,$params,$limit,$sort,$sortBy);
             }
             return $response;
         }
@@ -53,13 +47,13 @@
          * @link /docs/develop/queryStringCondition
          * @return array
          */
-        public function getElementsCount(string $table, string $field, string $cond = null):array {
+        /* public function getElementsCount(string $table, string $field, string $cond = null):array {
             if (empty($table)) {
                 return ['type' => "error", 'message' => "No hay tabla para consultar."];
             } else {
                 return $this->getDBTableDataCount($table,$field,$cond);
             }
-        }
+        } */
         /**
          * Función para la inserción de datos a la base de datos.
          *
@@ -70,11 +64,11 @@
          * 
          * @return array
          */
-        public function insertData ( string $tableName, array $data ):array {
+        public function insert ( string $tableName, array $data ):array {
             if (is_array($data)) {
                 return $this->setDBData('insert', $tableName, $data['fields'], $data['values']);
             } else {
-                return ['type' => "error", 'message' => "La información proporcionada tiene un formato no soportado.", 'data' => array()];
+                return ['error' => ['code' => 404, 'message' => "La información proporcionada tiene un formato no soportado."], 'data' => array()];
             }
         }
         /**
@@ -89,7 +83,7 @@
          * @link /docs/develop/queryStringCondition
          * @return array
          */
-        public function deleteData ( string $tableName, array $data ):array {
+        /* public function deleteData ( string $tableName, array $data ):array {
             if ( is_array($data) ) {
                 $fields = $data['fields'];
                 $values = $data['values'];
@@ -98,7 +92,7 @@
             } else {
                 return ['type' => "error", 'message' => "La información proporcionada tiene un formato no soportado.", 'data' => array()];
             }
-        }
+        } */
         /**
          * Función para realizar edición en registros en la base de datos.
          *
@@ -109,7 +103,7 @@
          * 
          * @return array
          */
-        public function editData ( string $tableName, array $data ):array {
+        /* public function editData ( string $tableName, array $data ):array {
             if ( is_array($data) ) {
                 $fields = $data['fields'];
                 $values = $data['values'];
@@ -118,11 +112,11 @@
             } else {
                 return ['type' => "error", 'message' => "La información proporcionada tiene un formato no soportado.", 'data' => array()];
             }
-        }
+        } */
 
-        public function massDataInsertion (string $table,array $data) {
+        /* public function massDataInsertion (string $table,array $data) {
             return $this->setMassInsertionData("insert",$data);
-        }
+        } */
         /**
          * Esta función sirve para insertar registros en la base de datos según la infromacion entregada por el usuario.
          *
@@ -186,81 +180,104 @@
                 }
                 $query_request .= " ;";
             }
-            $dbConnection = new ConnectionClass;
-            //var_dump($query_request);
-            //var_dump($query_Values);
-            $result = $dbConnection->consulta(['prepare_string'=>$query_request,'params'=>$query_Values], $type);
-            //var_dump($result);
-            if (isset($result['errors']['code']) && !empty($result['errors']['code'])) {
-                $response = ['type' => "error",'message'=> $result['errors'],'data'=>['rows' => [],'affrows' => null,'lastid' => null,]];
-            } else {
-                $response = ['type' => "success",'message' => null,'data' => ['rows' => $result['rows'],'affrows' => $result['row_aff'],'lastid' => $result['id_row'],]];
-            }
-            return $response;
+            $result = $this->getResponse($type,['prepare_string'=>$query_request,'params'=>$query_Values]);
+            return $this->interpreter($type, $result);
         }
         /**
          * Get registres from database using a table and fields given from user.
          *
-         * @param array|string $fields Fields to be return in an array
          * @param string $table Table to query for data
+         * @param array|string $query Request to query at the database
+         * @param array $joins Join for table
          * @param string $params Params to use to filter the data from the table given
+         * @param int $limit Limit of register to return
+         * @param string $order Ordering for register returned
+         * @param string $orderby Filter to order the register given
          * @return array
          */
-        protected function getDBData($table, $fields, $inners, $params):array {
-            $dbConnection = new ConnectionClass;
+        protected function getDBData($table, $query, $joins, $params, $limit, $order,$orderby):array {
             $values = [];
-            if ($fields == "all") {
-                $string = "SELECT * FROM $table";
-            } else {
-                if (is_array($fields)) {
-                    $c1 = count($fields) - 1;
-                    $string = "SELECT ";
-                    for ($x = 0; $x < count($fields); $x++ ) {
-                        $string .= ( $x < $c1 ) ? "`" . $fields[$x] . "`, " : "`" . $fields[$x] . "`";
+            $string = "SELECT ";
+            if (is_array($query) && !empty($query)) {
+                $t = count($query['fields']) - 1;
+                $y = 0;
+                foreach ($query['fields'] as $tabla => $fields) {
+                    $fc = count($fields);
+                    for ($x = 0; $x < ($fc - 1); $x++ ) {
+                        $asignado = explode("=", $fields[$x]);
+                        if (count($asignado) > 1) {
+                            $string .= "`$tabla`.`$asignado[0]` AS '$asignado[1]'";
+                        } else {
+                            $string .= "`$tabla`.`$fields[$x]`";
+                        }
+                        if ($x < $fc) $string .= ", ";
                     }
-                    $string .= " FROM `$table`";
-                } else {
-                    $string = "SELECT $fields FROM `$table`";
+                    if ($y < $t) $string .= ", ";
+                    $y++;
                 }
+            } else {
+                $string .= ($query == "all") ? "* " : $query;
             }
-            if ( !empty($inners) ) {
-                foreach ( $inners as $inner ) {
-                    $string .= " INNER $inner[innerType] `$inner[innerTable]` ON `$inner[innerTable]`.`$inner[innerFilter]` = `$inner[innerCompareTable]`.`$inner[innerCompare]`";
+            $string .= " FROM `$table`";
+            if ( !empty($joins) ) {
+                foreach ( $joins as $join ) {
+                    $string .= " $join[type] JOIN `$join[table]` ON `$join[main_table]`.`$join[main_filter]` = `$join[compare_table]`.`$join[compare_filter]`";
                 }
             }
             if (!is_null($params)) {
                 $string .= " WHERE ";
-                $pspt = preg_split('/([,|;|~|#])/',$params,-1,PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-                foreach ( $pspt as $ps ) {
-                    if ( $ps == "," ) {
-                        $string .= " AND ";
-                    } elseif ( $ps == ";" ) {
-                        $string .= " OR ";
-                    } elseif ( $ps == "~" ) {
-                        $string .= " LIKE ";
-                    } elseif ( $ps == "#" ) {
-                        $string .= " ORDER ";
-                    } else {
-                        $pair = explode(":",$ps);
-                        if (count($pair) > 1) {
-                            $string .= "$pair[0] ?";
-                            array_push($values,$pair[1]);
-                        } else {
-                            $string .= "$pair[0]";
-                        }
+                $condiciones = preg_split('/([,|;|~|#])/',$params,-1,PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+                foreach ( $condiciones as $cond ) {
+                    switch ($cond) {
+                        case ",":
+                            $string .= " AND ";
+                            break;
+                        case ";":
+                            $string .= " OR ";
+                            break;
+                        case "~":
+                            $string .= " LIKE ";
+                            break;
+                        case "#":
+                            $string .= " BETWEEN ";
+                            break;
+                        default:
+                            $pair = explode(":", $cond);
+                            if (count($pair) > 1) {
+                                $string .= "$pair[0] ?";
+                                array_push($values, $pair[1]);
+                            } else {
+                                $string .= "$pair[0]";
+                            }
+                            break;
                     }
                 }
             }
-            $string .= ";";
-            //var_dump($string);
-            //var_dump($values);
-            $consulta = $dbConnection->consulta(['prepare_string'=>$string,'params'=>$values], 'select');
-            //var_dump($consulta);
-            if (isset($consulta['errors']['code']) && !empty($consulta['errors']['code'])) {
-                return ['type' => "error", 'message' => $consulta['errors'], 'data' => array()];
-            } else {
-                return (count($consulta['rows']) > 0) ? ['type' => "success", 'message' => null, 'data' => $consulta['rows']] : ['type' => "alert", 'message' => "No hay registros en la tabla.", 'data' => []];
+            if ($order != '' and $orderby != '') {
+                if ($order != NULL and $orderby != NULL) {
+                    $order = strtoupper($order);
+                    switch ($order) {
+                        case 'ASC':
+                            $string .= " ORDER BY $orderby ASC ";
+                            break;
+                        case 'DES':
+                            $string .= " ORDER BY $orderby DESC ";
+                            break;
+                        case 'GROUP':
+                            $string .= " GROUP BY $orderby ";
+                            break;
+                        default:
+                            $string .= "";
+                            break;
+                    }
+                }
             }
+            if ($limit != NULL) {
+                if ($limit > 0) $string .= " LIMIT " . $limit . ";";
+            } else {
+                $string .= ";";
+            }
+            return $this->interpreter('select',$this->getResponse('select', ['prepare_string' => $string, 'params' => $values]));
         }
         /**
          * Get a count of rows in a table from database.
@@ -270,7 +287,7 @@
          * @param string $condicion Condition that have to be perform before data is retrieve
          * @return array
         */
-        protected function getDBTableDataCount($table,$campo,$condicion):array {
+        /* protected function getDBTableDataCount($table,$campo,$condicion):array {
             $dbConnection = new ConnectionClass;
             $string = "SELECT COUNT(?) AS 'qnt' FROM $table";
             $values[] = $campo;
@@ -308,8 +325,8 @@
             } else {
                 return (count($consulta['rows']) > 0) ? ['type' => "success", 'message' => null, 'data' => $consulta['rows']] : ['type' => "error", 'message' => "No hay registros en la tabla.", 'data' => []];
             }
-        }
-        protected function setMassInsertionData ($type,$values) {
+        } */
+        /* protected function setMassInsertionData ($type,$values) {
             $dbConnection = new ConnectionClass;
             $result = $dbConnection->consulta(['prepare_string'=>$values['string'],'params'=>$values['params']], $type);
             if (isset($result['errors']['code']) && !empty($result['errors']['code'])) {
@@ -318,14 +335,26 @@
                 $response = ['type' => "success",'message' => null,'data' => ['rows' => $result['rows'],'affrows' => $result['row_aff'],'lastid' => $result['id_row'],]];
             }
             return $response;
+        } */
+        /**
+         * Agrouping and sorting for data to return
+         * @param string $type Type of wuery done
+         * @param array $result Array of results
+         * @return array
+         */
+        private function interpreter(string $type, array $result) :array
+        {
+            if (isset($result['error']) && $result['error']['code'] != 0) {
+                return ['data' => [], 'error' => $result['error']];
+            } else {
+                if ($type == "select") {
+                    return ['data' => $result['rows'], 'error' => []];
+                } elseif ($type == "insert") {
+                    return ['data' => $result['id_row'], 'error' => []];
+                } else {
+                    return ['data'  => $result['row_aff'], 'error' => $result['error']];
+                }
+            }
         }
-    }
-    /**
-     * Clase para las transacciones de cambios en las tablas de la base de datos.
-     * @author Jorge Echeverria <jecheverria@bytes4run.com>
-     * @version 1.0.0
-     */
-    class DBContextClass {
-        public function dbContext_Select () {}
     }
 ?>
