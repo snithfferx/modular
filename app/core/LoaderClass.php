@@ -14,74 +14,44 @@
      * Clase de carga de la aplicación
      */
     class LoaderClass {
+        /**
+         * @var object Contiene el objeto de la clase controller
+         */
         private $controller;
+        /**
+         * @var bool Contiene la resolución sí el usuario está o no logueado.
+         */
         private $userAlive;
+        /**
+         * @var object Contiene ela resolución sí el objeto de la clase authentication
+         */
         private $auth;
+        /**
+         * @var object Contiene el objeto de la clase viewbuilder
+         */
         private $viewBuildeer;
+        /**
+         * @var object Contiene el objeto de la clase messenger
+         */
         private $messanger;
+        /**
+         * constructor
+         */
         function __construct() {
             $this->controller = new ControllerClass;
             $this->auth = new AuthenticationLibrary;
             $this->viewBuildeer = new ViewBuilderHelper;
             $this->messanger = new MessageHelper;
         }
-        function verifyRequest () {
+        /**
+         * Función que realiza la verificación de las distintas partes de la request
+         * para resolverla
+         * @return array
+         */
+        function verifyRequest () :array {
             $url = $_SERVER['REQUEST_URI'] ?? '/';
-            $serverRequestMethod = strtolower($_SERVER['REQUEST_METHOD']);
-            $pos = strpos($url,'?');
-            $path = ($pos === false) ? $url : substr($url,1,($pos - 1));
-            if ($path == "/") {
-                $response = $this->controller->getResponse([
-                    'sv_method' => $serverRequestMethod,
-                    'app_module'=> "home",
-                    'app_class' => "home",
-                    'app_method'=> "index",
-                    'app_params'=> null
-                ]);
-            } else {
-                $pathArray = explode('/', $path);
-                if ($pos != false) {
-                    $params = substr($url,$pos);
-                }else {
-                    array_shift($pathArray);
-                    $params = null;
-                }
-                $method = "index";
-                $pathArraySize = sizeof($pathArray);
-                $controller = $pathArray[0];
-                $class = $pathArray[0];
-                $request = [];
-                if ($pathArraySize > 3) {
-                    $class = $pathArray[1];
-                    $method = $pathArray[2];
-                    $params = $pathArray[3];
-                } elseif ($pathArraySize > 2) {
-                    $method = $pathArray[1];
-                    $params = $pathArray[2];
-                } elseif ($pathArraySize > 1) {
-                    $method = $pathArray[1];
-                } else {
-                    $request = $_GET;
-                }
-                if (empty($request)) {
-                    $request = [
-                        'sv_method' => $serverRequestMethod,
-                        'app_module'=> $controller,
-                        'app_class' => $class,
-                        'app_method'=> $method,
-                        'app_params'=> $params];
-                }
-                /* if ($this->userAlive == false) {
-                    if (!empty($_REQUEST) && $_REQUEST['ctr'] == "users") {
-                        $response = $this->controller->getResponse($_REQUEST);
-                    } else {*/
-                        $response = $this->controller->getResponse($request);
-                    //}
-                //} else {
-                  //  $response = (empty($_REQUEST)) ? $this->controller->getDefaultResponse() : $this->controller->getResponse($_REQUEST);
-                //}
-            }
-            return $response;
+            $srvRqstMtd = strtolower($_SERVER['REQUEST_METHOD']);
+            return $this->routeResolve($srvRqstMtd,$url);
         }
         function display ($values) {
             return $this->controller->view($values);
@@ -93,6 +63,63 @@
         function terminate () {
             $this->controller = null;
             $this->userAlive = null;
+        }
+        protected function routeResolve(string $method,string $uri) :array {
+            $pos = strpos($uri, '?');
+            $path = ($pos === false) ? $uri : substr($uri, 1, ($pos - 1));
+            if ($path == "/") {
+                $response = $this->controller->getResponse([
+                    'sv_method' => $method,
+                    'app_module'=> "home",
+                    'app_class' => "home",
+                    'app_method'=> "index",
+                    'app_params'=> null
+                ]);
+            } else {
+                $pathArray = explode('/', $path);
+                if ($pos != false) {
+                    $prms = substr($uri, $pos);
+                } else {
+                    array_shift($pathArray);
+                    $prms = null;
+                }
+                $mtd = "index";
+                $pathArraySize = sizeof($pathArray);
+                $ctr = $pathArray[0];
+                $clss = $pathArray[0];
+                $request = [];
+                if ($pathArraySize > 3) {
+                    $clss = $pathArray[1];
+                    $mtd = $pathArray[2];
+                    $prms = $pathArray[3];
+                } elseif ($pathArraySize > 2) {
+                    $mtd = $pathArray[1];
+                    $prms = $pathArray[2];
+                } elseif ($pathArraySize > 1) {
+                    $mtd = $pathArray[1];
+                } else {
+                    $request = $_GET;
+                }
+                if (empty($request)) {
+                    $request = [
+                        'sv_method' => $method,
+                        'app_module'=> $ctr,
+                        'app_class' => $clss,
+                        'app_method'=> $mtd,
+                        'app_params'=> $prms
+                    ];
+                }
+                /* if ($this->userAlive == false) {
+                        if (!empty($_REQUEST) && $_REQUEST['ctr'] == "users") {
+                            $response = $this->controller->getResponse($_REQUEST);
+                        } else {*/
+                $response = $this->controller->getResponse($request);
+                //}
+                //} else {
+                //  $response = (empty($_REQUEST)) ? $this->controller->getDefaultResponse() : $this->controller->getResponse($_REQUEST);
+                //}
+            }
+            return $response;
         }
     }
 ?>
