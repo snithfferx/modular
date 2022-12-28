@@ -15,8 +15,10 @@
         }
         /**
          * Revisa sí la sesión está inicializada
+         * Devuelve true sí la sesión existe y el tiempo de vida aún es mayor a cero.
+         * @return bool
          */
-        public function isSessionStarted() {
+        public function isSessionStarted() :bool {
             $response = false;
             if ($this->sessionUser === false) @session_start();
             if (!empty($_SESSION)) {
@@ -39,15 +41,18 @@
         }
         /**
          * Mata una sesion de usuario
+         * @return bool
          */
-        public function userSessionKiller () {
+        public function userSessionKiller () :bool {
             if ($this->sessionUser === false) @session_start();
             return $this->sessionKiller();
         }
         /**
-         * Extrae la información de una sesion
+         * Extrae la información de una sesión
+         * @param string $value Contiene la petición del controller o usuario.
+         * @return array
          */
-        public function getSessionData ($value) {
+        public function getSessionData (string $value) :array {
             return $this->getUserSessionData($value);
         }
         /**
@@ -55,24 +60,34 @@
          */
         public function __destruct() {
             $this->sessionUser = null;
+            $this->tokenator = null;
         }
-        public function createToken ($values) {
+        /**
+         * Crea un token usando la información proporcionada por la petición
+         * @param array $values
+         * @return array
+         */
+        public function createToken (array $values) :array {
             return $this->getToken($this->tokenator->make($values));
         }
         /**
          * Revisa sí el tiempo de la sesion se ha agotado
+         * Devuelve false sí el tiempo actual es mayor al desifnado.
+         * @param int $time Contiene el tiempo designado
+         * @return bool
          */
-        protected function isTimeOut ($time) {
+        protected function isTimeOut (int $time) :bool {
             date_default_timezone_set("America/El_Salvador");
             $serverTime = time();
             $leftTime = $time - $serverTime;
             return ($leftTime <= 0) ? true : false;
         }
         /**
-         * 
+         * Verifica la existencia de una sesión, sí existe elimina la sesión y cambia el estado del token
+         * @return bool
          */
-        protected function sessionKiller() {
-            if (isset($_SESSION['token'])) $this->tokenator->kill($_SESSION['token']);
+        protected function sessionKiller() :bool {
+            //if (isset($_SESSION['token'])) $this->tokenator->kill($_SESSION['token']);
             session_unset();
             session_destroy();
             return true;
@@ -108,7 +123,13 @@
             }
             return $response;
         }
-        private function keepAlive ($time = 0) {
+        /**
+         * Calcula tiempo para el indice time de la sessión
+         *
+         * @param integer $time
+         * @return integer
+         */
+        private function keepAlive (int $time = 0) :int {
             date_default_timezone_set("America/El_Salvador");
             $serverTime = time();
             $timeLimit  = (60 ^ 3) * 24;
@@ -121,6 +142,11 @@
             }
             return $response;
         }
+        /**
+         * Compara que el token ya exista en la sesión.
+         * @param array $vars Contiene el token a ser verificado
+         * @return array
+         */
         private function getToken(array $vars) : array {
             if (!empty($vars)) {
                 $_SESSION['token'] = $vars['token'];
@@ -239,7 +265,7 @@
             return ($leftTime <= 0) ? true : false;
         }
         protected function sessionKiller() {
-            if (isset($_SESSION['token'])) $this->killToken($_SESSION['token']);
+            //if (isset($_SESSION['token'])) $this->killToken($_SESSION['token']);
             session_unset();
             session_destroy();
             return true;
@@ -257,10 +283,10 @@
             }
             return $response;
         }
-        private function killToken ($token) {
+        /* private function killToken ($token) {
             $tokenator = new Tokenator;
             return $tokenator->kill($token);
-        }
+        } */
         private function decodeSessionLevel ($token) {
             $tokenator = new Tokenator;
             return $tokenator->get($token,'level');
@@ -274,10 +300,11 @@
             $result   = $tokenator->get($token,'user');
             $x        = strlen($result);
             $user     = substr($result,0,($x - 2));
-            require_once _MODELO_ . "User.php";
-            $model    = new User;
-            $response = $model->_get_("name",$user);
-            return $response['nombre'];
+            //require_once _MODELO_ . "User.php";
+            //$model    = new User;
+            //$response = $model->_get_("name",$user);
+            //return $response['nombre'];
+            return $user;
         }
         private function decodeSessionTimeOut ($time) {
             date_default_timezone_set("America/El_Salvador");
@@ -343,7 +370,7 @@
             }
             return $response;
         }
-        public function kill($val) {
+        /* public function kill($val) {
             if (!empty($val)) {
                 try {
                     Tokenator::killToken($val);
@@ -353,9 +380,13 @@
             } else {
                 return false;
             }
-        }
-
-        private function tokenMaker($user) {
+        } */
+        /**
+         * Genera un token usando la información dada
+         * @param string $user
+         * @return array
+         */
+        private function tokenMaker(string $user) {
             date_default_timezone_set("America/El_Salvador");
             $fecha = date("dmY");
             $hora  = date("His");
@@ -367,11 +398,14 @@
             return ['id'=>$sid,'token'=>$tokenSession];
         }
         private function tokenFinder($value) {
-            $tokenData = $this->tokenDecode($value);
-            require_once _MODELO_ . "User.php";
-            $model = new User;
-            $response = $model->findToken($tokenData['date'],$tokenData['time'],$tokenData['user'],$tokenData['hashid'],$tokenData['hashtoken']);
-            return $response;
+            if ($_SESSION['token'] = $value) {
+                return $this->tokenDecode($value);
+            }
+            //require_once _MODELO_ . "User.php";
+            //$model = new User;
+            //$response = $model->findToken($tokenData['date'],$tokenData['time'],$tokenData['user'],$tokenData['hashid'],$tokenData['hashtoken']);
+            //return $response;
+            return false;
         }
         private function tokenDecode ($token) {
             $arrayTime = explode("#",$token);
@@ -393,7 +427,7 @@
                 'hashid'=>$arrayHash[0],'hashsession'=>$arrayHash[1],'hashtoken'=>$arrayHash[2]];
             return $response;
         }
-        private function killToken ($token) {
+        /* private function killToken ($token) {
             require_once _MODELO_ . "User.php";
             $model = new User;
             $tokenData = $this->tokenDecode($token);
@@ -404,7 +438,7 @@
                 $tokenData['date'],
                 $tokenData['time']);
             return $response;
-        }
+        } */
     }
     class CookieMonster {
         public function makeACookie ($values) {
@@ -421,9 +455,9 @@
                     break;
             }
         }
-        public function killTheCookie ($val) {
+        /* public function killTheCookie ($val) {
             return CookieMonster::burnTheCookie($val);
-        }
+        } */
 
         private function cookieOven ($sessionData) {
             date_default_timezone_set("America/El_Salvador");
@@ -446,21 +480,21 @@
                     //CookieMonster::saveTheCookie($cookieName,$cookieId,$val,$timeOut);
                 }
                 return true;
-            } catch (Exception $th) {
+            } catch (\Exception $th) {
                 return $th;
             }
         }
-        private function saveTheCookie ($name,$value,$time = 0) {
+        /* private function saveTheCookie ($name,$value,$time = 0) {
             require_once _MODELO_ . "User.php";
             $model = new User;
             $response = $model->saveThisCookie($name,$value,$time);
             return $response;
-        }
-        private function burnTheCookie ($cookieId) {
+        } */
+        /* private function burnTheCookie ($cookieId) {
             require_once _MODELO_ . "User.php";
             $model = new User;
             $response = $model->deleteTheCookie($cookieId);
             return $response;
-        }
+        } */
     }
 ?>
