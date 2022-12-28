@@ -5,26 +5,22 @@
      */
     use app\core\classes\ControllerClass;
     use app\core\libraries\AuthenticationLibrary;
-    use app\modules\model\UserModel;
+    use app\modules\users\models\UserModel;
     /**
      * Clase Usuarios
      */
     class UserController extends ControllerClass {
         /**
-         * @var user_model Contiene el model de los usuarios
+         * @var object $user_model Contiene el model de los usuarios
          */
         private $user_model;
         /**
-         * @var auth Contiene el objeto de la libreria Autorizacion
+         * @var object $auth Contiene el objeto de la libreria Autorizacion
          */
         private $auth;
-        /**
-         * Construye la clase Usuario
-         * @return Object User
-         */
         public function __construct() {
             $this->user_model = new UserModel;
-            $This->auth = new AuthenticationLibrary;
+            $this->auth = new AuthenticationLibrary;
         }
         /**
          * Crea un Token para el usuario el cual es guardado en la base de datos 
