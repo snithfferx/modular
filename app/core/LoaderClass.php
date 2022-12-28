@@ -4,12 +4,13 @@
      * Class Loader
      * @author Snithfferx <jecheverria@bytes4run.com>
      * @package app\core
-     * @version 1.0.0
+     * @version 2.0.4 dev r1
      */
     use app\core\classes\ControllerClass;
     use app\core\libraries\AuthenticationLibrary;
-    use app\core\helpers\MessageHelper;
+    use app\core\helpers\MessengerHelper;
     use app\core\helpers\ViewBuilderHelper;
+    use app\core\helpers\RouterHelper;
     /**
      * Clase de carga de la aplicación
      */
@@ -29,19 +30,21 @@
         /**
          * @var object Contiene el objeto de la clase viewbuilder
          */
-        private $viewBuildeer;
+        private $viewBuilder;
         /**
          * @var object Contiene el objeto de la clase messenger
          */
-        private $messanger;
+        private $messenger;
+        public $route;
         /**
          * constructor
          */
         function __construct() {
             $this->controller = new ControllerClass;
             $this->auth = new AuthenticationLibrary;
-            $this->viewBuildeer = new ViewBuilderHelper;
-            $this->messanger = new MessageHelper;
+            $this->viewBuilder = new ViewBuilderHelper;
+            $this->messenger = new MessengerHelper;
+            $this->route = new RouterHelper;
         }
         /**
          * Función que realiza la verificación de las distintas partes de la request
@@ -49,18 +52,26 @@
          * @return array
          */
         function verifyRequest () :array {
-            $url = $_SERVER['REQUEST_URI'] ?? '/';
-            $srvRqstMtd = strtolower($_SERVER['REQUEST_METHOD']);
-            return $this->routeResolve($srvRqstMtd,$url);
+            $path = $this->route->resolve();
+            /* if ($this->userAlive == false) {
+                if ($path['app_module'] == "users") {
+                    $response = $this->controller->getResponse($path);
+                } else {
+                    $response = $this->messenger->buildError(401);
+                }
+            } else {*/
+                $response = $this->controller->getResponse($path);
+            //} */
+            return $response;
         }
         function display ($values) {
-            return $this->controller->view($values);
+            return $this->renderView($values);
         }
-        function init () {
+        function init () :bool {
             //$this->userAlive = $this->auth->isSessionStarted();
             return true;
         }
-        function terminate () {
+        function terminate () :void {
             $this->controller = null;
             $this->userAlive = null;
         }
@@ -118,6 +129,23 @@
                 //} else {
                 //  $response = (empty($_REQUEST)) ? $this->controller->getDefaultResponse() : $this->controller->getResponse($_REQUEST);
                 //}
+            }
+            return $response;
+        }
+        private function renderView ($values) :string {
+            if (isset($values['view'])) {
+                if ($this->viewBuilder->find($values['view'])) {
+                    $response = $this->viewBuilder->build($values);
+                } else {
+                    $response = $this->viewBuilder->build($this->messenger->build(['type'=>"error",'data'=>['code'=>404, $values]]));
+                }
+            } else {
+                if (is_string($values)) {
+                    $response = $values;
+                } else {
+                    $message = json_encode($values);
+                    $response = $message;
+                }
             }
             return $response;
         }
