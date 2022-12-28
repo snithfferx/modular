@@ -10,5 +10,6 @@
     ##GLOBAL VIEW Variable
     if (!defined("_VIEW_")) define("_VIEW_",dirname(_APP_) . "/public/views/");
     ##GLOBAL CONFIGURATION Variable
-    if (!defined("_CONF_")) define("_CONF_",_APP_ . "/core/config/");
+    if (!defined("_CONF_")) define("_CONF_",dirname(_APP_) . "/configs/");
+    if (!defined("_CACHE_")) define("_CACHE_", dirname(_APP_) . "/cache/");
 ?>
