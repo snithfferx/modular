@@ -13,7 +13,7 @@ Basado en MVC, consta de las clases necesarias para conexión a base de datos y 
 3. [Instalacion](#instalacion)
 4. [Tecnologías](#tecnologias)
 5. [Estructura de datos](#estructura-de-datos)
-6. [FQA](#fqas)
+6. [FQA](#fqa)
 7. [Créditos](#creditos)
 
 ### Informacion General
@@ -24,6 +24,7 @@ Se encuentra estructurado de la siguiente manera.
 ### Instalacion
 
 Para instalar la aplicación, debera tener lo siguiente.
+
 - PHP 7.0 o superior
 - MariaDB 8 o superior (MySQL en su defecto)
 - Tener instalados los modulos, php_curl, pdo, mod_rewrite, (asegurarse que estén activos.)
@@ -43,9 +44,9 @@ Sí se quiere usar la última versión de Vue y Vite es necesario Node.js 16 o s
 
 ### Tecnologias
 
-- *[PHP](http://www.php.com)*
-- *[HTML5](http://ww3.school.com)*
-- *[Javascript](http://www.javascript.com)*
+- [PHP](http://www.php.com)
+- [HTML5](http://ww3.school.com)
+- [Javascript](http://www.javascript.com)
 
 ### Estructura de datos
 
@@ -60,4 +61,4 @@ La aplicación tiene la siguiente estructura:
 - Autor: Jorge Echeverria.
 - Contacto: [jecheverria@bytes4run.com](jecheverria@bytes4run)
 - Website: [sito web](https://bytes4run.com/applications/modular)
-- Tema: [AdminLTE](https://adminlte.io) 
+- Tema: [AdminLTE](https://adminlte.io)
