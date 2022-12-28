@@ -7,7 +7,12 @@
      * @version 1.0.0
      */
     namespace app\core\classes\context;
+    use app\core\helpers\ConfigHelper;
     class ConnectionClass {
+        private $globalConf;
+        public function __construct() {
+            $this->globalConf = new ConfigHelper;
+        }
         private $ds_context;
         private $conexion;
         private $host;
@@ -29,7 +34,7 @@
                 ];
             }
         }
-        protected function getDBResponse($query, $type, $base = null)
+        private function getDBResponse($query, $type, $base = null)
         {
             $retorna = [];
             $errors = null;
@@ -96,9 +101,9 @@
             ];
             return $retorna;
         }
-        protected function getConfig()
+        private function getConfig()
         {
-            global $__CONF;
+            $__CONF = $this->globalConf->get();
             if (!empty($__CONF)) {
                 $this->host     = $__CONF['dbhost'];
                 $this->port     = $__CONF['dbport'];
@@ -110,7 +115,7 @@
                 return false;
             }
         }
-        public function getResponse($type, $request)
+        public function getResponse(string $type, array $request) :array
         {
             return $this->getDBResponse($request, $type);
         }
