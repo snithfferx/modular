@@ -9,9 +9,6 @@
     $app = new LoaderClass;
     $app->init();
     $response = $app->verifyRequest();
-    /*
     $app->display($response);
     $app->terminate();
-    */
-    var_dump($response);
 ?>
