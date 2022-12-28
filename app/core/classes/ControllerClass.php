@@ -9,13 +9,46 @@
      * @version 1.1.0
      */
     class ControllerClass {
+        /**
+         * Contiene el nombre del controlador al cuál se le hace la petición
+         * @var string controller
+         */
         private $controller;
+        /**
+         * Contiene el nombre del método al cual se le realiza la petición
+         * @var string method
+         */
         private $method;
+        /**
+         * Contiene la petición a realizarse
+         * @var string|array params
+         */
         private $params;
+        /**
+         * Contiene el arreglo de la configuración de la aplicación
+         * @var array $configs
+         */
         private $configs;
+        /**
+         * Contiene el método usado para realizar la petición
+         * @var string $serverMethod
+         */
         private $serverMethod;
+        /**
+         * Contiene el nombre del módulo a realizarle la petición
+         * @var string $module
+         */
         private $module;
+        /**
+         * Clase a la que se le realiza la petición
+         * @var string $class
+         */
         private $class;
+        /**
+         * Función parar resolver la peticón al controlador
+         * @param array $values
+         * @return array
+         */
         public function getResponse($values) {
             if (!empty($values)) {
                 if (isset($values['ctr'])) {
@@ -33,13 +66,18 @@
                     $this->method = ($values['app_method']) ?? 'index';
                     $this->params = ($values['app_params']) ?? null;
                 }
-                //$response = $this->getControllerResponse($this->module,$this->controller,$this->class,$this->method,$this->params);
+                $response = $this->getControllerResponse(
+                    $this->module,
+                    $this->controller,
+                    $this->class,
+                    $this->method,
+                    $this->params);/* 
                 $response = "Petici&oacute;n realizada con m&eacute;todo: $this->serverMethod.<br>
                     Hacia el m&oacute;dulo: $this->module.<br>
                     Usando el controller: $this->controller.<br>
                     Con Clase: $this->class.<br>
                     Usando la funci&oacute;n: $this->method.<br>
-                    Con parametros: $this->params.";
+                    Con parametros: $this->params."; */
             } else {
                 $response = $this->getDefaultResponse();
             }
