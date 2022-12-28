@@ -5,7 +5,10 @@
      * @author Jorge Echeverria <jecheverria@bytes4run.com>
      * @version 1.0.0
      */
-    class MessageHelper {
-        
+    class MessengerHelper {
+        public function build(array $values)
+        {
+        return array($values);
+        }
     }
 ?>
