@@ -3,6 +3,7 @@
     class AuthenticationLibrary {
         private $sessionUser;
         private $tokenator;
+        private $session;
         function __Construct () {
             if ( php_sapi_name() !== 'cli' ) {
                 if ( version_compare(phpversion(), '5.4.0', '>=') ) {
@@ -12,6 +13,7 @@
                 }
             }
             $this->tokenator = new Tokenator;
+            $this->session = new AppSession;
         }
         /**
          * Revisa sí la sesión está inicializada
@@ -56,19 +58,24 @@
             return $this->getUserSessionData($value);
         }
         /**
-         * Destructor de la clase
-         */
-        public function __destruct() {
-            $this->sessionUser = null;
-            $this->tokenator = null;
-        }
-        /**
          * Crea un token usando la información proporcionada por la petición
          * @param array $values
          * @return array
          */
         public function createToken (array $values) :array {
-            return $this->getToken($this->tokenator->make($values));
+            return $this->getToken($this->tokenator->make($values['id']));
+        }
+        public function startSession (array $values)
+        {
+            return $this->setSession($values);
+        }
+        /**
+         * Destructor de la clase
+         */
+        public function __destruct()
+        {
+            $this->sessionUser = null;
+            $this->tokenator = null;
         }
         /**
          * Revisa sí el tiempo de la sesion se ha agotado
@@ -92,6 +99,11 @@
             session_destroy();
             return true;
         }
+        protected function setSession(array $values) :array
+        {
+            return $this->session->startSession($values);
+        }
+
         private function getUserSessionData ($value) {
             if ($this->sessionUser === false) @session_start();
             //if (isset($_SESSION['token']) && !empty($_SESSION['token'])) {
@@ -126,8 +138,8 @@
         /**
          * Calcula tiempo para el indice time de la sessión
          *
-         * @param integer $time
-         * @return integer
+         * @param int $time
+         * @return int
          */
         private function keepAlive (int $time = 0) :int {
             date_default_timezone_set("America/El_Salvador");
@@ -215,8 +227,12 @@
         public function startSession($values) {
             if ($this->sessionUser === false) @session_start();
             $user         = $values['user_id'] . $values['user_level'] . $values['user_sublevel'];
-            $tokenator    = new Tokenator;
-            $tokenSESSION = $tokenator->make($user);
+            if (!isset($values['user_token'])) {
+                $tokenator = new Tokenator;
+                $tokenSESSION = $tokenator->make($user);
+            } else {
+                $tokenSESSION = $values['user_token'];
+            }
             if (!is_string($tokenSESSION)) {
                 return false;
             } else {
@@ -229,9 +245,14 @@
                 $baker             = new CookieMonster;
                 $result            = $baker->makeACookie($values);
                 $session['cookie'] = $result;
+                /* echo "<pre>";
+                var_dump($session);
+                echo "</pre>";
+                exit; */
                 $_SESSION          = $session;
+                $session['id'] = session_id();
                 session_write_close();
-                return true;
+                return $session;
             }
         }
         public function userSessionKiller () {
@@ -325,7 +346,7 @@
     }
     class Tokenator {
         public function make($user) {
-            return Tokenator::tokenMaker($user);
+            return $this->tokenMaker($user);
         }
         public function get($val,$result) {
             /* 'time'=>substr($subTime,0,2) . ":" . substr($subTime,2,2) . ":" . substr($subTime,4,2),
@@ -334,38 +355,38 @@
             'hashid'=>$arrayHash[0],'hashsession'=>$arrayHash[1],'hashtoken'=>$arrayHash[2]] */
             switch ($result) {
                 case "exist":
-                    $response = Tokenator::tokenFinder($val);
+                    $response = $this->tokenFinder($val);
                     break;
                 case "user":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['user'];
                     break;
                 case "id":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['hashid'];
                     break;
                 case "token":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['hashtoken'];
                     break;
                 case "time":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['time'];
                     break;
                 case "date":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['date'];
                     break;
                 case "level":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['level'];
                     break;
                 case "sublv":
-                    $tokenData= Tokenator::tokenDecode($val);
+                    $tokenData= $this->tokenDecode($val);
                     $response = $tokenData['sublevel'];
                     break;
                 default:
-                    $response = Tokenator::tokenDecode($val);
+                    $response = $this->tokenDecode($val);
                     break;
             }
             return $response;
@@ -373,7 +394,7 @@
         /* public function kill($val) {
             if (!empty($val)) {
                 try {
-                    Tokenator::killToken($val);
+                    $this->killToken($val);
                 } catch (Exception $e) {
                     return $e;
                 }
@@ -393,9 +414,15 @@
             $text  = $fecha . "-" . $hora . "_$" . $user;
             $encripted = base64_encode($text);
             $hashu = hash("sha256",$encripted);
-            $sid   = session_id();
-            $tokenSession = "@" . $hora . "#" . $fecha . "$" . $user . "." . $sid . "." . $hashu;
-            return ['id'=>$sid,'token'=>$tokenSession];
+            $sid   = null;
+            if (session_id() != '') $sid = session_id();
+            $tokenSession = "@" . $hora . "#" . $fecha . "$" . $user . ".";
+            if (!is_null($sid)) $tokenSession .= $sid . ".";
+            $tokenSession .= $hashu;
+            return [
+                'session'=> $tokenSession,
+                'token'=> $hashu
+            ];
         }
         private function tokenFinder($value) {
             if ($_SESSION['token'] = $value) {
@@ -442,7 +469,7 @@
     }
     class CookieMonster {
         public function makeACookie ($values) {
-            return CookieMonster::cookieOven($values);
+            return $this->cookieOven($values);
         }
         public function getACookie ($val,$result) {
             switch ($val) {
@@ -462,14 +489,15 @@
         private function cookieOven ($sessionData) {
             date_default_timezone_set("America/El_Salvador");
             $fecha = date("mY_His");
-            $host  = $_SERVER['HTTP_REFERER'];
+            $host  = $_SERVER['HTTP_HOST'];
             $cookieName = $fecha . $sessionData['user_id'];
             $cookieStr  = "";
             setcookie($cookieName . "[session]",$cookieStr,$sessionData['timeout'],'/',$host,true,false);
             header("Set-Cookie: key=$cookieName; SameSite=Lax");
             //$response = CookieMonster::saveTheCookie($cookieName,null,$cookieStr);
             if (isset($sessionData['options'])) {
-                CookieMonster::cookieOptions($cookieName,$sessionData['options'],$sessionData['timeout'],$host);
+                $cookieOps = $this->cookieOptions($cookieName,$sessionData['options'],$sessionData['timeout'],$host);
+                if (!$cookieOps) return $cookieOps;
             }
             return $cookieName;
         }
