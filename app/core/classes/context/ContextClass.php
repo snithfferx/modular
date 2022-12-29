@@ -27,11 +27,11 @@
          * @link /docs/develop/queryStringCondition
          * @return array
          */
-        public function select(string $tableName, mixed $data, array $joins = [],string $params="", int $limit = 1000, string $sort = '', string $sortBy = '') :array {
+        public function select(string $tableName, array $data, int $limit = 1000, string $sort = '', string $sortBy = '') :array {
             if (empty($tableName)) {
                 $response = ['error'=>['code'=>404,'message' => "No hay tabla para consultar."], 'data' => array()];
             } else {
-                $response = $this->getDBData($tableName,$data,$joins,$params,$limit,$sort,$sortBy);
+                $response = $this->getDBData($tableName,$data,$limit,$sort,$sortBy);
             }
             return $response;
         }
@@ -195,7 +195,7 @@
          * @param string $orderby Filter to order the register given
          * @return array
          */
-        protected function getDBData($table, $query, $joins, $params, $limit, $order,$orderby):array {
+        protected function getDBData($table, $query, $limit, $order,$orderby):array {
             $values = [];
             $string = "SELECT ";
             if (is_array($query) && !empty($query)) {
@@ -219,13 +219,14 @@
                 $string .= ($query == "all") ? "* " : $query;
             }
             $string .= " FROM `$table`";
-            if ( !empty($joins) ) {
-                foreach ( $joins as $join ) {
+            if ( !empty($query['joins']) ) {
+                foreach ( $query['joins'] as $join ) {
                     $string .= " $join[type] JOIN `$join[table]` ON `$join[main_table]`.`$join[main_filter]` = `$join[compare_table]`.`$join[compare_filter]`";
                 }
             }
-            if (!is_null($params)) {
+            if (!is_null($query['params'])) {
                 $string .= " WHERE ";
+                $params = $query['params'];
                 $condiciones = preg_split('/([,|;|~|#])/',$params,-1,PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
                 foreach ( $condiciones as $cond ) {
                     switch ($cond) {
