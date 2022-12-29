@@ -23,7 +23,7 @@ class ViewBuilderHelper {
         $this->smarty->setCompileDir(_CACHE_);
         $this->smarty->left_delimiter = '{{';
         $this->smarty->right_delimiter = '}}';
-        $this->smarty->testInstall();
+        //$this->smarty->testInstall();
         $this->configs = new ConfigHelper;
         $this->auth = new AuthenticationLibrary;
     }
