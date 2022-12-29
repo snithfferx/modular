@@ -3,7 +3,7 @@
     use app\core\helpers\ConfigHelper;
     use app\core\helpers\MessengerHelper;
     use app\core\libraries\AuthenticationLibrary;
-    require "../helpers/DefinerHelper.php";
+    require __DIR__ . "/../helpers/DefinerHelper.php";
     /**
      * Clase que analiza y busca el controlador en la aplicación.
      * @category File
@@ -133,7 +133,7 @@
                             'code'=>404,
                             'message'=>"Error, el modulo no existe"]]);
                 } else {
-                    $controllerInstance = $this->getComponent($module,$controller,$class);
+                    $controllerInstance = $this->getComponent($module, "controllers",$controller,$class);
                     if (!is_array($controllerInstance)) {
                         if (method_exists($controllerInstance,$method)) {
                             try {
@@ -158,13 +158,14 @@
         }
         protected function getComponent (string $moduleName, string $type = "controllers", string $componentName = null, string $className = null) {
             $path = _MODULE_;
+            $path .= $moduleName . "/" . $type . "/";
             $componentFile = ucfirst($componentName);
-            if (!is_null($className) && $className != $componentFile) $componentFile .= "_" . $className . "Controller";
-            $path .= ucfirst($moduleName) . "/$type/";
+            $componentClass = ucfirst($className);
+            $componentFile .= (!is_null($className) && $className != $componentName) ? "_" . $componentClass . "Controller" : "Controller";
             $path .= "$componentFile.php";
             if (file_exists($path)) {
                 try {
-                    $componentNameSpace = "app/core/modules/$moduleName/$type/$componentFile";
+                    $componentNameSpace = "app/modules/$moduleName/$type/$componentFile";
                     $componentToUse = str_replace('/', '\\', $componentNameSpace);
                     $response = new $componentToUse;
                 } catch (\Exception $exepcion) {
