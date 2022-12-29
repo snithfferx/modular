@@ -4,16 +4,13 @@
      * Class Loader
      * @author Snithfferx <jecheverria@bytes4run.com>
      * @package app\core
-     * @version 2.0.4 dev r1
+     * @version 2.0.5 dev r1
      */
     use app\core\classes\ControllerClass;
     use app\core\libraries\AuthenticationLibrary;
     use app\core\helpers\MessengerHelper;
     use app\core\helpers\ViewBuilderHelper;
     use app\core\helpers\RouterHelper;
-    /**
-     * Clase de carga de la aplicación
-     */
     class LoaderClass {
         /**
          * @var object Contiene el objeto de la clase controller
@@ -140,12 +137,7 @@
                     $response = $this->viewBuilder->build($this->messenger->build(['type'=>"error",'data'=>['code'=>404, $values]]));
                 }
             } else {
-                if (is_string($values)) {
-                    $response = $values;
-                } else {
-                    $message = json_encode($values);
-                    $response = $message;
-                }
+                $response = (is_string($values)) ? $values : json_encode($values);
             }
             return $response;
         }
