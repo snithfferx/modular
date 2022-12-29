@@ -12,8 +12,8 @@
         /*public function __construct() {
             $this-> = ;
         }*/
-        public function index($var = null) {
-            return $var;
+        public function index() {
+            return [];
         }
     }
 ?>
