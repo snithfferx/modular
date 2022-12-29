@@ -39,7 +39,7 @@ class RouterHelper {
             if ($this->qmPos != false) {
                 $prms = substr($this->url, $this->qmPos);
             } else {
-                //array_shift($pathArray);
+                array_shift($pathArray);
                 $prms = null;
             }
             $mtd = "index";
