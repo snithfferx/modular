@@ -6,10 +6,10 @@
     ##GLOBAL HELPER Core Variable
     if (!defined("_HELPER_")) define("_HELPER_",_APP_ . "/core/helpers/");
     ##GLOBAL MODULE Core Variable
-    if (!defined("_MODULE_")) define("_MODULE_",_APP_ . "/modules/");
+    if (!defined("_MODULE_")) define("_MODULE_",dirname(_APP_) . "/modules/");
     ##GLOBAL VIEW Variable
     if (!defined("_VIEW_")) define("_VIEW_",dirname(_APP_) . "/public/views/");
     ##GLOBAL CONFIGURATION Variable
-    if (!defined("_CONF_")) define("_CONF_",dirname(_APP_) . "/configs/");
-    if (!defined("_CACHE_")) define("_CACHE_", dirname(_APP_) . "/cache/");
+    if (!defined("_CONF_")) define("_CONF_",dirname(_APP_,2) . "/configs/");
+    if (!defined("_CACHE_")) define("_CACHE_", dirname(_APP_,2) . "/cache/");
 ?>
