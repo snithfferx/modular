@@ -6,9 +6,6 @@
     namespace app\modules\home\controllers;
     use app\core\classes\ControllerClass;
     class HomeController extends ControllerClass {
-        /**
-         * 
-         */
         /*public function __construct() {
             $this-> = ;
         }*/

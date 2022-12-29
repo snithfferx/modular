@@ -65,7 +65,7 @@
             return $this->renderView($values);
         }
         function init () :bool {
-            //$this->userAlive = $this->auth->isSessionStarted();
+            $this->userAlive = $this->auth->isSessionStarted();
             return true;
         }
         function terminate () :void {
