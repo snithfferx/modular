@@ -147,6 +147,7 @@
                             $response = $this->messenger->build(['type'=>"erro",'data'=>['code'=>404,
                                 'message'=>"Method Requested Is Not Valid"]]);
                         }
+                        return $response;
                     }
                     return $controllerInstance;
                 }
