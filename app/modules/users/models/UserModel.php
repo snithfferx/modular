@@ -6,18 +6,35 @@ class UserModel extends ContextClass{
     public $logAction;
     public $logData;
     public $userToken;
+    public $userSession;
     public function get() {
+        return true;
+    }
+    public function set () {
         return true;
     }
     public function findToken(string $token) :array
     {
-         return $this->findSessionToken($token);
+        return $this->findSessionToken($token);
     }
     public function saveLog (string $action,$data) {
         $this->logAction = $action;
         $this->logData = $data;
         return $this->saveUserLog();
     }
+    public function getUser(string $userName) :array
+    {
+        if ($userName == "jorge") {
+            return ['data' => ['id'=>65,'user'=>$userName,'type'=>"success"]];
+        } else {
+            return ['error' => "Not Found"];
+        }
+    }
+    public function saveSession() :array
+    {
+        return $this->saveUserSession();
+    }
+
     private function findSessionToken(string $values)
     {
         $result = $this->select(
@@ -45,6 +62,13 @@ class UserModel extends ContextClass{
         $result = $this->insert("user_logs",[
             'fields'=>['time','user','action','extra'],
             'values'=>['NOW()',$this->user,$this->logAction,$this->logData]
+        ]);
+        return $result;
+    }
+    private function saveUserSession() {
+        $result = $this->insert("user_session", [
+            'fields' => ['time', 'user', 'action', 'extra'],
+            'values' => ['NOW()', $this->user, $this->logAction, $this->logData]
         ]);
         return $result;
     }
