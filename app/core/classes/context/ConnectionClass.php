@@ -48,9 +48,6 @@
                 } else {
                     if (!empty($type)) {
                         $pdo_Statement = $this->conexion->prepare($query['prepare_string']);
-                        /* echo '<pre>';
-                        var_dump($pdo_Statement);
-                        echo '</pre>'; */
                         if ($type == 'insert' || $type == 'update' || $type == 'delete') {
                             try {
                                 $pdo_Statement->execute($query['params']);

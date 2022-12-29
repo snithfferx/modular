@@ -345,7 +345,8 @@
          */
         private function interpreter(string $type, array $result) :array
         {
-            if (isset($result['error']) && $result['error']['code'] != 0) {
+            if (isset($result['error'])) {
+                // && $result['error']['code'] != 0
                 return ['data' => [], 'error' => $result['error']];
             } else {
                 if ($type == "select") {
