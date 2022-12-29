@@ -1,6 +1,7 @@
 <?php
+    namespace app\modules\users\controllers;
     /**
-     * @author jecheverria@
+     * @author jecheverria@bytes4run.com
      * @version 1.0
      */
     use app\core\classes\ControllerClass;
@@ -9,7 +10,7 @@
     /**
      * Clase Usuarios
      */
-    class UserController extends ControllerClass {
+    class UsersController extends ControllerClass {
         /**
          * @var object $user_model Contiene el model de los usuarios
          */
@@ -59,7 +60,8 @@
             return true;
         }
         private function findToken (array $values) :array {
-            if ($this->user_model->findToken($values['token'])) {
+            $result = $this->user_model->findToken($values['token']);
+            if (empty($result['error'])) {
                 $this->user_model->saveLog($values['token']);
                 return true;
             }
