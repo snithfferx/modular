@@ -37,7 +37,8 @@ class RouterHelper {
         } else {
             $pathArray = explode('/', $path);
             if ($this->qmPos != false) {
-                $prms = substr($this->url, $this->qmPos);
+                $params = substr($this->url, ($this->qmPos + 1));
+                $prms = $this->createParams($params);
             } else {
                 array_shift($pathArray);
                 $prms = null;
@@ -65,7 +66,7 @@ class RouterHelper {
                     $prms = $pathArray[2];
                     break;
                 default:
-                    $mtd = $pathArray[1];
+                    $mtd = ($pathArray[1]) ?? 'index';
                     break;
             }
             $response = [
@@ -78,5 +79,14 @@ class RouterHelper {
             ];
         }
         return $response;
+    }
+    protected function createParams (string $uri) {
+        $uriArray = explode("&", $uri);
+        $uriParameters = array();
+        foreach ($uriArray as $param) {
+            $parameter = explode("=", $param);
+            $uriParameters[$parameter[0]] = $parameter[1];
+        }
+        return $uriParameters;
     }
 }
