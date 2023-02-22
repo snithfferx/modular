@@ -1,0 +1,121 @@
+{
+    "00001" : {
+        "code" : "00001",
+        "message" : "Server Error. Access denied.",
+        "icon" : "fa-ban",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00002" : {
+        "code" : "00002",
+        "message" : "Server Error. Data Base not found.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00003" : {
+        "code" : "00003",
+        "message" : "Server Error. Query request invalid.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00004" : {
+        "code" : "00004",
+        "message" : "Server Error. Data Base return null.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00005" : {
+        "code" : "00005",
+        "message" : "Controller Error. No Controller instance found.",
+        "icon" : "fa-info-circle",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00006" : {
+        "code" : "00006",
+        "message" : "Controller Error. Method not found.",
+        "icon" : "fa-info-circle",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00007" : {
+        "code" : "00007",
+        "message" : "Method Error. Invalid information given, return null.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00008" : {
+        "code" : "00008",
+        "message" : "Method Error. Information not found",
+        "icon" : "fa-info",
+        "color" : "text-primary",
+        "type" : "info"
+    },
+    "00009" : {
+        "code" : "00009",
+        "message" : "Method Error. View not found",
+        "icon" : "fa-info-triangle",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00010" : {
+        "code" : "00010",
+        "message" : "Type is not supported",
+        "icon" : "fa-info-triangle",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00201" : {
+        "code" : "201",
+        "message" : "Data not found or Not printable data returned.",
+        "icon" : "fa-info",
+        "color" : "text-primary",
+        "type" : "ok"
+    },
+    "00202" : {
+        "code" : "202",
+        "message" : "Data found; but can not be displayed.",
+        "icon" : "fa-info-circle",
+        "color" : "text-primary",
+        "type" : "info"
+    },
+    "00401" : {
+        "code" : "401",
+        "message" : "User invalid or security violation, please contact administration for more information.",
+        "icon" : "fa-ban",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00403" : {
+        "code" : "403",
+        "message" : "Security violation. User is invalid. You not have access.",
+        "icon" : "fa-ban",
+        "color" : "text-warning",
+        "type" : "alert"
+    },
+    "00500" : {
+        "code" : "500",
+        "message" : "Server Internal error.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00501" : {
+        "code" : "501",
+        "message" : "Server not responding petitions.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-danger",
+        "type" : "error"
+    },
+    "00404" : {
+        "code" : "404",
+        "message" : "Data not found. Please try with a different information.",
+        "icon" : "fa-exclamation-triangle",
+        "color" : "text-danger",
+        "type" : "error"
+    }
+}
