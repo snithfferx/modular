@@ -2,3 +2,5 @@
 vendor
 node_modules
 vue
+admin
+Dockerfile
