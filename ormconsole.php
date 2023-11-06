@@ -1,0 +1,1 @@
+<?php require "app/core/libraries/console.php"; ?>
