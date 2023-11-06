@@ -1,38 +1,37 @@
 {
-    "author":"Bytes4Run",
-    "descripcion":"Compraventa, Inventarios, Recursos, Administración, Contabilidad y Producción",
-    "version":"0.0.1",
-    "shortversion":"1.0",
-    "language":"es",
-    "skin":"default",
-    "app_name":"CIRACO",
+    "app_name":"",
+    "app_description":"",
+    "app_author":"",
+    "app_company":"",
+    "app_company_url":"http:\/\/",
+    "app_start_year":"2022",
+    "app_enviroment":"dev",
+    "app_default_ctr":"dashboard",
+    "app_url":"http:\/\/localhost\/",
+    "app_version":"0.0.0",
+    "app_short_version":"0.0",
+    "app_language":"es",
     "app_logo":"app_logo.png",
-    "app_url":"http:\/\/ciraco.test\/",
-    "company":"Bytes4Run",
-    "companyURL":"http:\/\/www.bytes4run.com\/",
-    "startYear":"2022",
-    "dbhost":"127.0.0.1",
-    "dbport":"3306",
-    "dbname":"ciracp_db",
-    "dbuser":"root",
-    "dbpass":"",
-    "enviroment":"dev",
-    "default_ctr":"home",
-    "colaboration":[
+    "app_logo_mini":"app_logo_mini.png",
+    "app_tile_color":"#ffffff",
+    "app_theme_color":"#ffffff",
+    "app_background_color":"#ffffff",
+    "app_view":{
+        "engine":"smarty",
+        "theme":"adminlte"
+    },
+    "app_colab":[
         {
             "theme":[
                 {
-                    "url":"https:\/\/adminlte.io\/",
-                    "name":"AdminLTE 3.2"
+                    "url":"https:\/\/www.adminlte.io\/",
+                    "name":"AdminLTE"
                 }
             ],
             "technology":[
                 {
-                    "url":"https:\/\/www.smarty.net\/",
+                "url":"https:\/\/www.smarty.net\/",
                     "name":"SMARTY 3.0"
-                },{
-                    "url":"https:\/\/github.com\/PHPMailer\/PHPMailer",
-                    "name":"PHPMailer 6.4.0"
                 }
             ]
         }
