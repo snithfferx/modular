@@ -1,6 +1,6 @@
-.vscode
-vendor
-node_modules
-vue
-admin
-Dockerfile
+# IdEs
+.vscode/
+.idea/
+# Carpetas
+vendor/
+# Archivos
